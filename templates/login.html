@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in — Library Catalog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-shell">
+        <aside class="login-brand" aria-hidden="true">
+            <p class="login-brand__eyebrow">Civic Library</p>
+            <h1 class="login-brand__title">Library database</h1>
+            <p class="login-brand__tagline">Browse the collection, manage circulation, and keep customer records in one place.</p>
+            <ul class="login-brand__roles" title="Role accent colors used across the app">
+                <li><span class="swatch swatch--admin"></span> Admin</li>
+                <li><span class="swatch swatch--staff"></span> Staff</li>
+                <li><span class="swatch swatch--customer"></span> Customers</li>
+            </ul>
+        </aside>
+
+        <main class="login-panel">
+            <div class="login-card">
+                <header class="login-card__header">
+                    <h2>Sign in</h2>
+                    <p>Use your library account. Authentication will activate once the database is connected.</p>
+                </header>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <ul class="flash-list" role="status">
+                    {% for category, msg in messages %}
+                    <li class="flash flash--{{ category }}">{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+
+                <form class="login-form" method="post" action="{{ url_for('login_post') }}" novalidate>
+                    <div class="field">
+                        <label for="username">Username or email</label>
+                        <input id="username" name="username" type="text" autocomplete="username" placeholder="customer name or staff id" required>
+                    </div>
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Sign in</button>
+                </form>
+
+                <p class="login-card__footer">
+                    Need an account? <span class="muted">Customer self-registration will open with the full release.</span>
+                </p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

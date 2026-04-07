@@ -1,0 +1,240 @@
+:root {
+    --admin-green: #013220;
+    --staff-green: #014421;
+    --customer-green: #355e3b;
+    --admin-green-light: #035238;
+    --bg: #f5f5f9;
+    --card-bg: #ffffff;
+    --border-subtle: #e0e0ea;
+    --text-main: #222222;
+    --text-muted: #666a73;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body.login-page {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+}
+
+.login-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+}
+
+@media (max-width: 900px) {
+    .login-shell {
+        grid-template-columns: 1fr;
+    }
+}
+
+.login-brand {
+    background: linear-gradient(165deg, var(--staff-green) 0%, var(--admin-green) 72%);
+    color: #fff;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.login-brand__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    opacity: 0.9;
+}
+
+.login-brand__title {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.login-brand__tagline {
+    margin: 0;
+    max-width: 28rem;
+    line-height: 1.55;
+    font-size: 0.98rem;
+    opacity: 0.92;
+}
+
+.login-brand__roles {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    font-size: 0.85rem;
+}
+
+.login-brand__roles li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    opacity: 0.95;
+}
+
+.swatch {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.swatch--admin {
+    background: var(--admin-green);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.swatch--staff {
+    background: var(--staff-green);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+.swatch--customer {
+    background: var(--customer-green);
+}
+
+.login-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    padding: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+.login-card__header h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.45rem;
+    font-weight: 600;
+}
+
+.login-card__header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.flash-list {
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+}
+
+.flash {
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.85rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.flash--info {
+    background: #e8f4ec;
+    color: #1b4332;
+    border: 1px solid #b7dfc4;
+}
+
+.flash--error {
+    background: #fdecea;
+    color: #611a15;
+    border: 1px solid #f5c6c2;
+}
+
+.login-form {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--text-main);
+}
+
+.field input {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field input::placeholder {
+    color: #9aa0a6;
+}
+
+.field input:hover {
+    border-color: #c5c9d4;
+}
+
+.field input:focus {
+    outline: none;
+    border-color: var(--customer-green);
+    box-shadow: 0 0 0 3px rgba(53, 94, 59, 0.2);
+}
+
+.btn-submit {
+    margin-top: 0.25rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #fff;
+    background: var(--staff-green);
+    transition: background 0.15s, transform 0.05s;
+}
+
+.btn-submit:hover {
+    background: var(--admin-green-light);
+}
+
+.btn-submit:active {
+    transform: translateY(1px);
+}
+
+.login-card__footer {
+    margin: 1.35rem 0 0;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.login-card__footer .muted {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.82rem;
+}
