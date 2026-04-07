@@ -48,6 +48,17 @@
                     <button type="submit" class="btn-submit">Sign in</button>
                 </form>
 
+                {% if dev_skip_login_available %}
+                <div class="dev-skip-login" role="note">
+                    <p class="dev-skip-login__title">Temporary developer access</p>
+                    <p class="dev-skip-login__text">
+                        Real sign-in is not wired yet. You may open the staff dashboard for local testing only.
+                        <strong>This bypass must be removed before release.</strong>
+                    </p>
+                    <a class="dev-skip-login__link" href="{{ url_for('dev_skip_login') }}">Skip login (dev only)</a>
+                </div>
+                {% endif %}
+
                 <p class="login-card__footer">
                     Need an account? <span class="muted">Customer self-registration will open with the full release.</span>
                 </p>

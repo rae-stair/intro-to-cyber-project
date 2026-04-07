@@ -165,6 +165,46 @@ body.login-page {
     border: 1px solid #f5c6c2;
 }
 
+.flash--warning {
+    background: #fff8e6;
+    color: #6d4c00;
+    border: 1px solid #e6c96a;
+}
+
+.dev-skip-login {
+    margin-top: 1.25rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px dashed #c9a227;
+    background: #fffbeb;
+}
+
+.dev-skip-login__title {
+    margin: 0 0 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #7a5f00;
+}
+
+.dev-skip-login__text {
+    margin: 0 0 0.65rem;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #5c4a21;
+}
+
+.dev-skip-login__link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6d4c00;
+}
+
+.dev-skip-login__link:hover {
+    color: #4a3400;
+}
+
 .login-form {
     margin-top: 1.5rem;
     display: flex;
