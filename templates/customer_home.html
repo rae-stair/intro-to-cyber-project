@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer — Library Catalog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <style>
+        .customer-dev-panel { max-width: 520px; margin: 2rem auto; padding: 1.5rem; }
+        .customer-dev-panel h1 { font-size: 1.25rem; margin-top: 0; }
+        .customer-dev-panel p { color: var(--text-muted); line-height: 1.5; }
+        .customer-actions { margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .customer-actions a { color: var(--customer-green); font-weight: 600; }
+    </style>
+</head>
+<body class="login-page">
+    <div class="customer-dev-panel login-card" style="box-shadow: var(--shadow-soft); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--card-bg);">
+        <p class="dev-skip-login__title" style="margin-top:0;">Temporary dev — customer role</p>
+        <h1>Customer / patron home</h1>
+        <p>This page is a placeholder until Justin’s patron UI is routed here. Use it to confirm dev role routing.</p>
+        <div class="customer-actions">
+            <a href="{{ url_for('login') }}">Back to login</a>
+            <a href="{{ url_for('dev_logout') }}">Dev logout (clear session)</a>
+        </div>
+    </div>
+</body>
+</html>
