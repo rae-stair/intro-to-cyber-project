@@ -12,12 +12,16 @@ from flask import (
     flash,
     redirect,
     render_template,
+    request,
     send_from_directory,
     session,
     url_for,
 )
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_FRONT_DIR = os.path.join(ROOT_DIR, "Project Front End")
+
+DEV_ROLES = frozenset({"staff", "admin", "customer"})
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-in-production")
@@ -33,6 +37,17 @@ def _dev_skip_login_enabled() -> bool:
 def _session_has_auth() -> bool:
     """TEMPORARY: dev skip flag; later add Firebase/session checks."""
     return bool(session.get("dev_skip_auth"))
+
+
+def _dev_role_ok(role: str) -> bool:
+    return _session_has_auth() and session.get("dev_role") == role
+
+
+@app.before_request
+def _migrate_legacy_dev_session():
+    """Old dev bypass had no role; treat as staff."""
+    if session.get("dev_skip_auth") and session.get("dev_role") not in DEV_ROLES:
+        session["dev_role"] = "staff"
 
 
 @app.context_processor
@@ -60,25 +75,76 @@ def login_post():
     return redirect(url_for("login"))
 
 
+@app.get("/_pf/css/<path:filename>")
+def project_front_css(filename):
+    """Static assets for Project Front End/admin.html when served from /admin."""
+    return send_from_directory(os.path.join(PROJECT_FRONT_DIR, "css"), filename)
+
+
+@app.get("/_pf/js/<path:filename>")
+def project_front_js(filename):
+    return send_from_directory(os.path.join(PROJECT_FRONT_DIR, "js"), filename)
+
+
 @app.get("/dev/skip-login")
 def dev_skip_login():
-    """TEMPORARY — remove before production. Navigates to staff dashboard without real auth."""
+    """TEMPORARY — remove before production. ?role=staff|admin|customer"""
     if not _dev_skip_login_enabled():
         abort(404)
+    role = (request.args.get("role") or "staff").strip().lower()
+    if role not in DEV_ROLES:
+        flash("Invalid dev role. Choose staff, admin, or customer.", "error")
+        return redirect(url_for("login"))
     session["dev_skip_auth"] = True
+    session["dev_role"] = role
     flash(
-        "Temporary dev mode: login was skipped. Remove /dev/skip-login before production.",
+        f"Temporary dev mode: signed in as {role}. Remove dev bypass before production.",
         "warning",
     )
-    return redirect(url_for("staff_dashboard"))
+    if role == "staff":
+        return redirect(url_for("staff_dashboard"))
+    if role == "admin":
+        return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("customer_home"))
+
+
+@app.get("/dev/logout")
+def dev_logout():
+    """TEMPORARY — clear dev session."""
+    session.pop("dev_skip_auth", None)
+    session.pop("dev_role", None)
+    flash("Dev session cleared.", "info")
+    return redirect(url_for("login"))
+
+
+@app.get("/admin")
+def admin_dashboard():
+    """Admin UI (Project Front End/admin.html). TEMP: requires dev_role admin."""
+    if not _dev_role_ok("admin"):
+        flash("This page requires the admin role. On the login screen use dev bypass → Admin.", "error")
+        return redirect(url_for("login"))
+    return send_from_directory(PROJECT_FRONT_DIR, "admin.html")
 
 
 @app.get("/staff")
 def staff_dashboard():
-    """Staff UI prototype (books.html) — requires session until Firebase handles auth."""
-    if not _session_has_auth():
+    """Staff UI (books.html). TEMP: requires dev_role staff."""
+    if not _dev_role_ok("staff"):
+        flash("This page requires the staff role. On the login screen use dev bypass → Staff.", "error")
         return redirect(url_for("login"))
     return send_from_directory(ROOT_DIR, "books.html")
+
+
+@app.get("/customer")
+def customer_home():
+    """Customer / patron placeholder until patron UI is integrated."""
+    if not _dev_role_ok("customer"):
+        flash(
+            "This page requires the customer role. On the login screen use dev bypass → Customer.",
+            "error",
+        )
+        return redirect(url_for("login"))
+    return render_template("customer_home.html")
 
 
 if __name__ == "__main__":

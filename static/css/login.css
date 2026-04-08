@@ -205,6 +205,62 @@ body.login-page {
     color: #4a3400;
 }
 
+.dev-skip-login__roles {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dev-skip-login__roles li {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.6rem;
+    font-size: 0.82rem;
+    color: #5c4a21;
+}
+
+.dev-skip-login__role-btn {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    background: var(--staff-green);
+}
+
+.dev-skip-login__role-btn:hover {
+    background: var(--admin-green-light);
+    color: #fff;
+}
+
+.dev-skip-login__roles li:nth-child(1) .dev-skip-login__role-btn {
+    background: var(--staff-green);
+}
+
+.dev-skip-login__roles li:nth-child(2) .dev-skip-login__role-btn {
+    background: var(--admin-green);
+}
+
+.dev-skip-login__roles li:nth-child(3) .dev-skip-login__role-btn {
+    background: var(--customer-green);
+}
+
+.dev-skip-login__hint {
+    margin: 0.85rem 0 0;
+    font-size: 0.78rem;
+}
+
+.dev-skip-login__hint a {
+    color: #6d4c00;
+    font-weight: 600;
+}
+
 .login-form {
     margin-top: 1.5rem;
     display: flex;
