@@ -15,14 +15,13 @@
     --table-header-bg: #f3f3fa;
 }
 
-/* GLOBAL RESET / BOX-SIZING */
+/* RESET */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
-/* GLOBAL */
 body {
     margin: 0;
     padding: 0;
@@ -44,42 +43,32 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    border-radius: 0;
-    margin: 0;
 }
 
-/* LEFT SIDE: ARROW + TITLE ON ONE LINE */
 .header-left {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex: 1 1 auto;
-    min-width: 0;
 }
 
 .back-arrow {
     font-size: 26px;
     font-weight: 600;
     cursor: pointer;
-    user-select: none;
 }
 
-/* ONE-LINE TITLE */
 .header-title {
     font-size: 22px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: white;
 }
 
-/* RIGHT SIDE */
 .header-right {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0;
 }
 
 .access-badge {
@@ -105,23 +94,21 @@ body {
     background: #a32020;
 }
 
-/* PAGE CONTENT BELOW HEADER */
+/* ========================= */
+/*        PAGE CONTENT       */
+/* ========================= */
+
 .page-content {
     padding: 20px;
 }
 
-/* ========================= */
-/*           CARDS           */
-/* ========================= */
-
 .card {
     background: var(--card-bg);
-    padding: 16px 20px 18px 20px;
+    padding: 16px 20px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--border-subtle);
     margin-bottom: 20px;
-    font-size: 18px;
 }
 
 .wide-card {
@@ -138,7 +125,6 @@ body {
     gap: 20px;
 }
 
-/* SECTION TITLES */
 .card h2 {
     margin: 0 0 14px 0;
     padding-bottom: 6px;
@@ -149,29 +135,10 @@ body {
 }
 
 /* ========================= */
-/*     QUICK SCAN INPUT      */
+/*     INPUTS (FULL WIDTH)   */
 /* ========================= */
 
-.card.half-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-.card.half-card input[type="text"] {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 18px;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    margin-top: 6px;
-}
-
-/* ========================= */
-/*  PATRON SEARCH MATCHING   */
-/* ========================= */
-
-.wide-card input[type="text"] {
+.card input[type="text"] {
     width: 100%;
     padding: 14px 16px;
     font-size: 18px;
@@ -195,8 +162,8 @@ body {
     padding: 14px 0;
     font-size: 18px;
     border-radius: var(--radius-md);
-    background: var(--admin-green-light) !important;
-    color: white !important;
+    background: var(--admin-green-light);
+    color: white;
 }
 
 /* ========================= */
@@ -211,22 +178,61 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    font-size: 18px;
 }
 
 /* ========================= */
 /*       OVERDUE LIST        */
 /* ========================= */
 
-.loading-list {
-    list-style: none;
-    padding: 0;
-    font-size: 18px;
+.overdue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.loading-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-subtle);
+.overdue-card {
+    display: flex;
+    background: #ffe5e5;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.overdue-bar {
+    width: 6px;
+    background: #d9534f;
+    border-radius: 6px 0 0 6px;
+    margin-right: 12px;
+}
+
+.overdue-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.overdue-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.overdue-title {
+    margin-top: 2px;
+    font-size: 0.95rem;
+}
+
+.overdue-meta {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.overdue-badge {
+    margin-top: 6px;
+    background: #ffb3b3;
+    color: #a30000;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    width: fit-content;
 }
 
 /* ========================= */
@@ -237,27 +243,22 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
-    font-size: 18px;
 }
 
 .data-table th {
     text-align: left;
     padding: 10px;
     background: var(--table-header-bg);
-    color: var(--text-main);
-    font-size: 18px;
 }
 
 .data-table td {
     padding: 10px;
     border-bottom: 1px solid var(--border-subtle);
-    font-size: 18px;
 }
 
 .loading-cell {
     text-align: center;
     color: var(--text-muted);
-    font-size: 18px;
 }
 
 /* ========================= */
@@ -268,8 +269,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 10px;
-    font-size: 18px;
 }
 
 .analytics-summary .metric {
@@ -285,12 +284,8 @@ body {
 
 .analytics-summary .label {
     font-weight: 600;
-    color: var(--text-main);
-    font-size: 18px;
 }
 
 .analytics-summary .value {
-    font-weight: 500;
     color: var(--text-muted);
-    font-size: 18px;
 }
