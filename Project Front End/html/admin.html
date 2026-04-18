@@ -2,294 +2,119 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Administrator Portal – System Management & Analytics</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/_pf/css/styles.css">
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="/_pf/css/admin.css">
 </head>
+
 <body>
 
-    <header class="admin-header">
-        <div class="admin-header__title">
-            <h1>Admin Portal</h1>
-            <p>System Management &amp; Analytics</p>
+    <!-- FULL-WIDTH HEADER -->
+   <header class="header">
+        <div class="header-left">
+            <span class="back-arrow">←</span>
+            <span class="header-title">Admin Portal</span>
         </div>
-        <div class="admin-header__meta">
-            <span class="badge">Admin [Full Access]</span>
+
+        <div class="header-right">
+            <span class="access-badge">Admin - Full Access</span>
+            <button class="logout-btn">Logout</button>
         </div>
     </header>
 
-    <nav class="admin-tabs">
-        <button class="admin-tab active" data-tab="analytics">Analytics</button>
-        <button class="admin-tab" data-tab="users">User Management</button>
-        <button class="admin-tab" data-tab="settings">System Settings</button>
 
-    </nav>
+    <!-- EVERYTHING BELOW MUST BE WRAPPED IN THIS -->
+    <div class="page-content">
 
-    <main class="admin-main">
-
-        <!-- Tab 1 Analytics -->
-        <section class="tab-panel active" id="tab-analytics">
-            <div class="grid grid-analytics-top">
-
-                <div class="stat-card">
-                    <p class="stat-label">Total Books</p>
-                    <div class="stat-main">
-                        <span id="total-books" class="loading">Loading…</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <p class="stat-label">Active Members</p>
-                    <div class="stat-main">
-                        <span id="active-members" class="loading">Loading…</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <p class="stat-label">Books Checked Out</p>
-                    <div class="stat-main">
-                        <span id="books-out" class="loading">Loading…</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <p class="stat-label">Late Returns</p>
-                    <div class="stat-main">
-                        <span id="late-returns" class="loading">Loading…</span>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="grid grid-analytics-bottom">
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>Monthly Circulation</h2>
-                    </div>
-                    <div class="panel-body">
-                        <div class="chart-placeholder">
-                            <span>Loading chart…</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>Popular Categories</h2>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="list-plain" id="popular-categories">
-                            <li>Loading…</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="panel panel-full">
-                    <div class="panel-header">
-                        <h2>Recent System Activity</h2>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="activity-list" id="recent-activity">
-                            <li>Loading…</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
+        <!-- TOP SECTION -->
+        <section class="card wide-card">
+            <h2>Popular Categories</h2>
+            <div class="chart-placeholder">Loading…</div>
         </section>
 
-        <!-- Tab 2 User Managemnt -->
-        <section class="tab-panel" id="tab-users">
+        <!-- MIDDLE SECTION -->
+        <section class="row">
 
-            <div class="panel">
-                <div class="panel-header panel-header--row">
-                    <h2>Staff &amp; Admin Accounts</h2>
-                    <button class="btn btn-primary">Add New User</button>
-                </div>
-                <div class="panel-body">
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Role</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Last Login</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-table">
-                                <tr><td colspan="6">Loading…</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- Quick Scan -->
+            <div class="card half-card">
+                <h2>Quick Scan by ID</h2>
+                <input type="text" placeholder="Scan barcode or enter ISBN…" disabled value="Loading…">
+                <div class="button-row">
+                    <button disabled>Check Out</button>
+                    <button disabled>Check In</button>
                 </div>
             </div>
 
-            <div class="panel panel-roles">
-                <div class="panel-header">
-                    <h2>Role Permissions</h2>
-                </div>
-                <div class="panel-body panel-body--roles">
+            <!-- Overdue Tracker -->
+            <div class="card half-card">
+                <h2>Overdue Books Tracker</h2>
+                <ul class="list loading-list">
+                    <li>Loading…</li>
+                    <li>Loading…</li>
+                    <li>Loading…</li>
+                </ul>
+            </div>
 
-                    <div class="role-column">
-                        <h3>Library Staff</h3>
-                        <label class="checkbox-row"><input type="checkbox" disabled> <span>Loading…</span></label>
-                        <label class="checkbox-row"><input type="checkbox" disabled> <span>Loading…</span></label>
-                        <label class="checkbox-row"><input type="checkbox" disabled> <span>Loading…</span></label>
+        </section>
+
+        <!-- BOTTOM SECTION -->
+        <section class="row">
+
+            <!-- Patron Management -->
+            <div class="card wide-card">
+                <h2>Patron Management</h2>
+
+                <input type="text" placeholder="Search patrons…" disabled value="Loading…">
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Member ID</th>
+                            <th>Email</th>
+                            <th>Books Out</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
+                        <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
+                        <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Analytics Summary -->
+            <div class="card half-card">
+                <h2>Analytics Summary</h2>
+
+                <div class="analytics-summary">
+                    <div class="metric">
+                        <span class="label">Total Books</span>
+                        <span class="value">Loading…</span>
                     </div>
 
-                    <div class="role-column">
-                        <h3>Administrator</h3>
-                        <label class="checkbox-row"><input type="checkbox" disabled> <span>Loading…</span></label>
-                        <label class="checkbox-row"><input type="checkbox" disabled> <span>Loading…</span></label>
-                        <label class="checkbox-row"><input type="checkbox" disabled> <span>Loading…</span></label>
+                    <div class="metric">
+                        <span class="label">Active Members</span>
+                        <span class="value">Loading…</span>
                     </div>
 
+                    <div class="metric">
+                        <span class="label">Books Checked Out</span>
+                        <span class="value">Loading…</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="label">Late Returns</span>
+                        <span class="value">Loading…</span>
+                    </div>
                 </div>
             </div>
 
         </section>
 
-        <!-- Tab 3 Settings -->
-        <section class="tab-panel" id="tab-settings">
+    </div> <!-- END page-content -->
 
-            <div class="grid grid-settings">
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>System Configuration</h2>
-                    </div>
-                    <div class="panel-body">
-
-                        <div class="form-group">
-                            <label>Library Name</label>
-                            <input id="library-name" type="text" value="Loading…">
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Late Fee (per day)</label>
-                                <input id="late-fee" type="text" value="Loading…">
-                            </div>
-                            <div class="form-group">
-                                <label>Max Books Per Customer</label>
-                                <input id="max-books" type="text" value="Loading…">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Checkout Duration (days)</label>
-                            <input id="checkout-duration" type="text" value="Loading…">
-                        </div>
-
-                        <button class="btn btn-primary">Save Configuration</button>
-
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>Database &amp; Maintenance</h2>
-                    </div>
-                    <div class="panel-body">
-
-                        <div class="maintenance-block">
-                            <div>
-                                <h3>Database Backup</h3>
-                                <p id="last-backup">Loading…</p>
-                            </div>
-                            <button class="btn btn-secondary">Backup Now</button>
-                        </div>
-
-                        <div class="maintenance-block">
-                            <div>
-                                <h3>System Logs</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <button class="btn btn-secondary">View Logs</button>
-                        </div>
-
-                        <div class="maintenance-block">
-                            <div>
-                                <h3>Data Export</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <button class="btn btn-secondary">Export Data</button>
-                        </div>
-
-                        <div class="maintenance-block danger">
-                            <div>
-                                <h3>Danger Zone</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <button class="btn btn-danger">Reset Fines</button>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="panel panel-full">
-                    <div class="panel-header">
-                        <h2>Email Notifications</h2>
-                    </div>
-                    <div class="panel-body email-grid">
-
-                        <div class="email-item">
-                            <div>
-                                <h3>Due Date Reminders</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="email-item">
-                            <div>
-                                <h3>New Book Alerts</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="email-item">
-                            <div>
-                                <h3>Overdue Notices</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="email-item">
-                            <div>
-                                <h3>System Updates</h3>
-                                <p>Loading…</p>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-    <script src="/_pf/js/app.js"></script>
+    <script src="/_pf/js/admin.js"></script>
 </body>
 </html>
