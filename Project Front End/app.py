@@ -23,8 +23,8 @@ PROJECT_FRONT_DIR = os.path.join(ROOT_DIR, "html")
 PROJECT_FRONT_CSS = os.path.join(ROOT_DIR, "static", "css")
 PROJECT_FRONT_JS = os.path.join(ROOT_DIR, "static", "js")
 
-
-DEV_ROLES = frozenset({"staff", "admin", "customer"})
+# Only admin + customer exist now
+DEV_ROLES = frozenset({"admin", "customer"})
 
 app = Flask(__name__, template_folder='html', static_folder='static')
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-in-production")
@@ -44,13 +44,6 @@ def _session_has_auth() -> bool:
 
 def _dev_role_ok(role: str) -> bool:
     return _session_has_auth() and session.get("dev_role") == role
-
-
-@app.before_request
-def _migrate_legacy_dev_session():
-    """Old dev bypass had no role; treat as staff."""
-    if session.get("dev_skip_auth") and session.get("dev_role") not in DEV_ROLES:
-        session["dev_role"] = "staff"
 
 
 @app.context_processor
@@ -91,21 +84,25 @@ def project_front_js(filename):
 
 @app.get("/dev/skip-login")
 def dev_skip_login():
-    """TEMPORARY — remove before production. ?role=staff|admin|customer"""
+    """TEMPORARY — remove before production. ?role=admin|customer"""
     if not _dev_skip_login_enabled():
         abort(404)
-    role = (request.args.get("role") or "staff").strip().lower()
+
+    role = (request.args.get("role") or "admin").strip().lower()
+
     if role not in DEV_ROLES:
-        flash("Invalid dev role. Choose staff, admin, or customer.", "error")
+        flash("Invalid dev role. Choose admin or customer.", "error")
         return redirect(url_for("login"))
+
     session["dev_skip_auth"] = True
     session["dev_role"] = role
+
     flash(
         f"Temporary dev mode: signed in as {role}. Remove dev bypass before production.",
         "warning",
     )
-    if role == "staff":
-        return redirect(url_for("staff_dashboard"))
+
+    # Staff no longer exists — only admin or customer
     if role == "admin":
         return redirect(url_for("admin_dashboard"))
     return redirect(url_for("customer_home"))
@@ -124,18 +121,9 @@ def dev_logout():
 def admin_dashboard():
     """Admin UI (Project Front End/admin.html). TEMP: requires dev_role admin."""
     if not _dev_role_ok("admin"):
-        flash("This page requires the admin role. On the login screen use dev bypass → Admin.", "error")
+        flash("This page requires the admin role. Use dev bypass → Admin.", "error")
         return redirect(url_for("login"))
     return send_from_directory(PROJECT_FRONT_DIR, "admin.html")
-
-
-@app.get("/staff")
-def staff_dashboard():
-    """Staff UI (staff.html). TEMP: requires dev_role staff."""
-    if not _dev_role_ok("staff"):
-        flash("This page requires the staff role. On the login screen use dev bypass → Staff.", "error")
-        return redirect(url_for("login"))
-    return send_from_directory(PROJECT_FRONT_DIR, "staff.html")
 
 
 @app.get("/customer")
@@ -143,7 +131,7 @@ def customer_home():
     """patron placeholder until patron UI is integrated."""
     if not _dev_role_ok("customer"):
         flash(
-            "This page requires the customer role. On the login screen use dev bypass → Customer.",
+            "This page requires the customer role. Use dev bypass → Customer.",
             "error",
         )
         return redirect(url_for("login"))
