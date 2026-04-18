@@ -8,113 +8,120 @@
 
 <body>
 
-    <!-- FULL-WIDTH HEADER -->
-   <header class="header">
-        <div class="header-left">
-            <span class="back-arrow">←</span>
-            <span class="header-title">Admin Portal</span>
+<header class="header">
+    <div class="header-left">
+        <span class="back-arrow">←</span>
+        <span class="header-title">Admin Portal</span>
+    </div>
+
+    <div class="header-right">
+        <span class="access-badge">Admin - Full Access</span>
+        <button class="logout-btn">Logout</button>
+    </div>
+</header>
+
+<div class="page-content">
+
+    <section class="card wide-card">
+        <h2>Popular Categories</h2>
+        <div class="chart-placeholder">Coming soon…</div>
+    </section>
+
+    <section class="row">
+
+        <div class="card half-card">
+            <h2>Quick Scan by ID</h2>
+            <input type="text" placeholder="Scan barcode or enter ISBN…" disabled>
+            <div class="button-row">
+                <button disabled>Check Out</button>
+                <button disabled>Check In</button>
+            </div>
         </div>
 
-        <div class="header-right">
-            <span class="access-badge">Admin - Full Access</span>
-            <button class="logout-btn">Logout</button>
+        <div class="card half-card">
+            <h2>Overdue Books Tracker</h2>
+
+            <div class="overdue-list">
+                {% for o in overdue %}
+                <div class="overdue-card">
+                    <div class="overdue-bar"></div>
+
+                    <div class="overdue-content">
+                        <div class="overdue-name">{{ o.name }}</div>
+                        <div class="overdue-title"><em>{{ o.title }}</em></div>
+
+                        <div class="overdue-meta">
+                            Due: {{ o.due_date }} • {{ o.phone }} • Book ID: {{ o.book_code }}
+                        </div>
+
+                        <div class="overdue-badge">
+                            {{ o.days_overdue }} days overdue
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p>No overdue books</p>
+                {% endfor %}
+            </div>
+
         </div>
-    </header>
 
+    </section>
 
-    <!-- EVERYTHING BELOW MUST BE WRAPPED IN THIS -->
-    <div class="page-content">
+    <section class="row">
 
-        <!-- TOP SECTION -->
-        <section class="card wide-card">
-            <h2>Popular Categories</h2>
-            <div class="chart-placeholder">Loading…</div>
-        </section>
+        <div class="card wide-card">
+            <h2>Patron Management</h2>
 
-        <!-- MIDDLE SECTION -->
-        <section class="row">
+            <input type="text" placeholder="Search patrons…" disabled>
 
-            <!-- Quick Scan -->
-            <div class="card half-card">
-                <h2>Quick Scan by ID</h2>
-                <input type="text" placeholder="Scan barcode or enter ISBN…" disabled value="Loading…">
-                <div class="button-row">
-                    <button disabled>Check Out</button>
-                    <button disabled>Check In</button>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Books Out</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6" class="loading-cell">Feature coming soon…</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card half-card">
+            <h2>Analytics Summary</h2>
+
+            <div class="analytics-summary">
+                <div class="metric">
+                    <span class="label">Total Books</span>
+                    <span class="value">{{ total_books }}</span>
+                </div>
+
+                <div class="metric">
+                    <span class="label">Active Members</span>
+                    <span class="value">{{ total_patrons }}</span>
+                </div>
+
+                <div class="metric">
+                    <span class="label">Books Checked Out</span>
+                    <span class="value">{{ checked_out }}</span>
+                </div>
+
+                <div class="metric">
+                    <span class="label">Late Returns</span>
+                    <span class="value">{{ overdue|length }}</span>
                 </div>
             </div>
+        </div>
 
-            <!-- Overdue Tracker -->
-            <div class="card half-card">
-                <h2>Overdue Books Tracker</h2>
-                <ul class="list loading-list">
-                    <li>Loading…</li>
-                    <li>Loading…</li>
-                    <li>Loading…</li>
-                </ul>
-            </div>
+    </section>
 
-        </section>
+</div>
 
-        <!-- BOTTOM SECTION -->
-        <section class="row">
-
-            <!-- Patron Management -->
-            <div class="card wide-card">
-                <h2>Patron Management</h2>
-
-                <input type="text" placeholder="Search patrons…" disabled value="Loading…">
-
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Member ID</th>
-                            <th>Email</th>
-                            <th>Books Out</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
-                        <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
-                        <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Analytics Summary -->
-            <div class="card half-card">
-                <h2>Analytics Summary</h2>
-
-                <div class="analytics-summary">
-                    <div class="metric">
-                        <span class="label">Total Books</span>
-                        <span class="value">Loading…</span>
-                    </div>
-
-                    <div class="metric">
-                        <span class="label">Active Members</span>
-                        <span class="value">Loading…</span>
-                    </div>
-
-                    <div class="metric">
-                        <span class="label">Books Checked Out</span>
-                        <span class="value">Loading…</span>
-                    </div>
-
-                    <div class="metric">
-                        <span class="label">Late Returns</span>
-                        <span class="value">Loading…</span>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-    </div> <!-- END page-content -->
-
-    <script src="/_pf/js/admin.js"></script>
+<script src="/_pf/js/admin.js"></script>
 </body>
 </html>

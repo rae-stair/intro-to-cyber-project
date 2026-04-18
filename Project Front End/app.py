@@ -1,9 +1,9 @@
 """
 Library database system — Flask entry (CSC 2362).
-Login UI is served here; real authentication will use SQL/Firebase later.
 """
 
 import os
+import sqlite3
 
 from flask import (
     Flask,
@@ -22,8 +22,13 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_FRONT_DIR = os.path.join(ROOT_DIR, "html")
 PROJECT_FRONT_CSS = os.path.join(ROOT_DIR, "static", "css")
 PROJECT_FRONT_JS = os.path.join(ROOT_DIR, "static", "js")
+DB_PATH = os.path.join(ROOT_DIR, "db", "library.db")
 
-# Only admin + customer exist now
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
 DEV_ROLES = frozenset({"admin", "customer"})
 
 app = Flask(__name__, template_folder='html', static_folder='static')
@@ -31,14 +36,12 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-in-produc
 
 
 def _dev_skip_login_enabled() -> bool:
-    """TEMPORARY: allow bypassing login only in debug or when explicitly opted in."""
     if os.environ.get("ALLOW_DEV_LOGIN_SKIP", "").lower() in ("1", "true", "yes"):
         return True
     return bool(current_app.debug)
 
 
 def _session_has_auth() -> bool:
-    """TEMPORARY: dev skip flag; later add Firebase/session checks."""
     return bool(session.get("dev_skip_auth"))
 
 
@@ -63,17 +66,12 @@ def login():
 
 @app.post("/login")
 def login_post():
-    # Stub: no SQL/Firebase yet — keep form UX without validating credentials.
-    flash(
-        "Sign-in is not active yet. Database and authentication are still being connected.",
-        "info",
-    )
+    flash("Sign-in is not active yet.", "info")
     return redirect(url_for("login"))
 
 
 @app.get("/_pf/css/<path:filename>")
 def project_front_css(filename):
-    """Static assets for Project Front End/admin.html when served from /admin."""
     return send_from_directory(PROJECT_FRONT_CSS, filename)
 
 
@@ -84,25 +82,20 @@ def project_front_js(filename):
 
 @app.get("/dev/skip-login")
 def dev_skip_login():
-    """TEMPORARY — remove before production. ?role=admin|customer"""
     if not _dev_skip_login_enabled():
         abort(404)
 
     role = (request.args.get("role") or "admin").strip().lower()
 
     if role not in DEV_ROLES:
-        flash("Invalid dev role. Choose admin or customer.", "error")
+        flash("Invalid dev role.", "error")
         return redirect(url_for("login"))
 
     session["dev_skip_auth"] = True
     session["dev_role"] = role
 
-    flash(
-        f"Temporary dev mode: signed in as {role}. Remove dev bypass before production.",
-        "warning",
-    )
+    flash(f"Dev mode: signed in as {role}.", "warning")
 
-    # Staff no longer exists — only admin or customer
     if role == "admin":
         return redirect(url_for("admin_dashboard"))
     return redirect(url_for("customer_home"))
@@ -110,7 +103,6 @@ def dev_skip_login():
 
 @app.get("/dev/logout")
 def dev_logout():
-    """TEMPORARY — clear dev session."""
     session.pop("dev_skip_auth", None)
     session.pop("dev_role", None)
     flash("Dev session cleared.", "info")
@@ -119,21 +111,43 @@ def dev_logout():
 
 @app.get("/admin")
 def admin_dashboard():
-    """Admin UI (Project Front End/admin.html). TEMP: requires dev_role admin."""
     if not _dev_role_ok("admin"):
-        flash("This page requires the admin role. Use dev bypass → Admin.", "error")
+        flash("Admin role required.", "error")
         return redirect(url_for("login"))
-    return send_from_directory(PROJECT_FRONT_DIR, "admin.html")
+
+    db = get_db()
+
+    overdue = db.execute("""
+        SELECT patrons.name,
+               patrons.phone,
+               books.code AS book_code,
+               books.title,
+               checkouts.due_date,
+               CAST((julianday('now') - julianday(checkouts.due_date)) AS INT) AS days_overdue
+        FROM checkouts
+        JOIN patrons ON patrons.id = checkouts.patron_id
+        JOIN books ON books.id = checkouts.book_id
+        WHERE checkouts.returned = 0
+          AND julianday('now') > julianday(checkouts.due_date)
+    """).fetchall()
+
+    total_books = db.execute("SELECT COUNT(*) FROM books").fetchone()[0]
+    total_patrons = db.execute("SELECT COUNT(*) FROM patrons").fetchone()[0]
+    checked_out = db.execute("SELECT COUNT(*) FROM checkouts WHERE returned = 0").fetchone()[0]
+
+    return render_template(
+        "admin.html",
+        overdue=overdue,
+        total_books=total_books,
+        total_patrons=total_patrons,
+        checked_out=checked_out
+    )
 
 
 @app.get("/customer")
 def customer_home():
-    """patron placeholder until patron UI is integrated."""
     if not _dev_role_ok("customer"):
-        flash(
-            "This page requires the customer role. Use dev bypass → Customer.",
-            "error",
-        )
+        flash("Customer role required.", "error")
         return redirect(url_for("login"))
     return render_template("patron_placeholder.html")
 
