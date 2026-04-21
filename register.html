@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Library Catalog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-shell">
+        <!-- LEFT SIDE (same branding) -->
+        <aside class="login-brand" aria-hidden="true">
+            <p class="login-brand__eyebrow">Civic Library</p>
+            <h1 class="login-brand__title">Library database</h1>
+            <p class="login-brand__tagline">
+                Create an account to access the library!
+            </p>
+            <ul class="login-brand__roles">
+                <li><span class="swatch swatch--admin"></span> Admin</li>
+                <li><span class="swatch swatch--staff"></span> Staff</li>
+                <li><span class="swatch swatch--customer"></span> Customers</li>
+            </ul>
+        </aside>
+
+        <!-- RIGHT SIDE -->
+        <main class="login-panel">
+            <div class="login-card">
+                <header class="login-card__header">
+                    <h2>Create Account</h2>
+                    <p>Register as a customer to start reserving books.</p>
+                </header>
+
+                <!-- FLASH MESSAGES -->
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="flash-list" role="status">
+                    {% for msg in messages %}
+                    <li class="flash flash--error">{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+
+                <!-- REGISTER FORM -->
+                <form class="login-form" method="post" action="{{ url_for('register') }}" novalidate>
+                    <div class="field">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" type="text" placeholder="choose a username" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Register</button>
+                </form>
+
+                <p class="login-card__footer">
+                    Already have an account?
+                    <a href="{{ url_for('login') }}">Sign in</a>
+                </p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

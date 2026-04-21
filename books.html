@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Dashboard – Browse & Reserve Books</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Star Ratings -->
+    <style>
+        .book-rating {
+            color: #f4b400;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+    </style>
+    <style>
+.alert {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+</style>
+</head>
+<body>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+        <div class="alert">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="admin-header__title">
+            <h1>Library Dashboard</h1>
+            <p>Browse, Search & Reserve Books</p>
+        </div>
+        <div class="admin-header__meta">
+            <span class="badge">Customer</span>
+            <a href="/logout" class="btn btn-danger" style="margin-left: 12px;">Logout</a>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="admin-tabs">
+        <button class="admin-tab active" data-tab="browse">Browse Books</button>
+        <button class="admin-tab" data-tab="my-books">My Books</button>
+    </nav>
+
+    <main class="admin-main">
+
+        <!-- Browsing -->
+        <section class="tab-panel active" id="tab-browse">
+
+            <!-- Searching -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Search Library</h2>
+                </div>
+                <div class="panel-body">
+                    <input 
+                        type="text" 
+                        id="search-bar" 
+                        placeholder="Search by title, author, or category..." 
+                        style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"
+                    >
+                </div>
+            </div>
+
+            <!-- Books list -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Available Books</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="book-table">
+
+    <tr>
+        <td>chicken chicken chicken</td>
+        <td>AN AUTHOR</td>
+        <td><span class="book-rating">★★★★☆</span></td>
+        <td><span class="status-pill status-active">Available</span></td>
+        <td>
+            <form action="/books/reserve/1" method="POST">
+                <button class="btn btn-primary">Reserve</button>
+            </form>
+        </td>
+    </tr>
+
+    <tr>
+        <td>CHICKEN</td>
+        <td>ANOTHER AUTHOR</td>
+        <td><span class="book-rating">★★★★★</span></td>
+        <td><span class="status-pill status-inactive">Checked Out</span></td>
+        <td>
+            <button class="btn btn-secondary" disabled>Unavailable</button>
+        </td>
+    </tr>
+
+    <tr>
+        <td>I want more chicken</td>
+        <td>AN AUTHOR AGAIN</td>
+        <td><span class="book-rating">★★★★☆</span></td>
+        <td><span class="status-pill status-active">Available</span></td>
+        <td>
+            <form action="/books/reserve/3" method="POST">
+                <button class="btn btn-primary">Reserve</button>
+            </form>
+        </td>
+    </tr>
+
+</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- My Books -->
+        <section class="tab-panel" id="tab-my-books">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>My Checked Out / Reserved Books</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-books-table">
+  {% for book in books %}
+    {% if book.reserved_by == session['user_id'] or not book.available %}
+      <tr>
+        <td>{{ book.title }}</td>
+        <td>
+          {% if book.available %}
+            <span class="status-pill status-active">Available</span>
+          {% elif book.reserved_by == session['user_id'] %}
+            <span class="status-pill status-inactive">Reserved</span>
+          {% else %}
+            <span class="status-pill status-inactive">Checked Out</span>
+          {% endif %}
+        </td>
+        <td>-</td> <!-- I need to add due dates here -->
+        <td>
+          {% if book.reserved_by == session['user_id'] %}
+            <form action="/books/cancel/{{ book.id }}" method="POST">
+              <button class="btn btn-secondary">Cancel</button>
+            </form>
+          {% else %}
+            <button class="btn btn-secondary" disabled>Unavailable</button>
+          {% endif %}
+        </td>
+      </tr>
+    {% endif %}
+  {% endfor %}
+</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
