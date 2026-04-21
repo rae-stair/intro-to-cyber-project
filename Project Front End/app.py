@@ -144,12 +144,93 @@ def admin_dashboard():
     )
 
 
+
 @app.get("/customer")
 def customer_home():
     if not _dev_role_ok("customer"):
         flash("Customer role required.", "error")
         return redirect(url_for("login"))
-    return render_template("patron_placeholder.html")
+
+    db = get_db()
+
+    # ALL BOOKS
+    books = db.execute("""
+        SELECT id, title, author, genre, status
+        FROM books
+        ORDER BY id
+    """).fetchall()
+
+    # TEMP: until login is real
+    patron_id = session.get("patron_id", 1)
+
+    # BOOKS THIS PATRON HAS CHECKED OUT
+    my_books = db.execute("""
+        SELECT books.title,
+               books.status,
+               checkouts.due_date,
+               books.id AS book_id
+        FROM checkouts
+        JOIN books ON books.id = checkouts.book_id
+        WHERE checkouts.patron_id = ?
+          AND checkouts.returned = 0
+    """, (patron_id,)).fetchall()
+
+    return render_template("patron_placeholder.html", books=books, my_books=my_books)
+
+
+
+@app.post("/books/reserve/<int:book_id>")
+def reserve_book(book_id):
+    if not _dev_role_ok("customer"):
+        flash("Customer role required.", "error")
+        return redirect(url_for("login"))
+
+    patron_id = session.get("patron_id", 1)
+    db = get_db()
+
+    db.execute("""
+        INSERT INTO checkouts (book_id, patron_id, due_date, returned)
+        VALUES (?, ?, date('now', '+14 days'), 0)
+    """, (book_id, patron_id))
+
+    db.execute("""
+        UPDATE books
+        SET status = 'checked_out'
+        WHERE id = ?
+    """, (book_id,))
+
+    db.commit()
+
+    flash("Book reserved successfully.")
+    return redirect(url_for("customer_home"))
+
+
+
+@app.post("/books/cancel/<int:book_id>")
+def cancel_book(book_id):
+    if not _dev_role_ok("customer"):
+        flash("Customer role required.", "error")
+        return redirect(url_for("login"))
+
+    patron_id = session.get("patron_id", 1)
+    db = get_db()
+
+    db.execute("""
+        UPDATE checkouts
+        SET returned = 1
+        WHERE book_id = ? AND patron_id = ? AND returned = 0
+    """, (book_id, patron_id))
+
+    db.execute("""
+        UPDATE books
+        SET status = 'in_stock'
+        WHERE id = ?
+    """, (book_id,))
+
+    db.commit()
+
+    flash("Book returned successfully.")
+    return redirect(url_for("customer_home"))
 
 
 if __name__ == "__main__":
