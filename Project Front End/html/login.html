@@ -9,10 +9,10 @@
 <body class="login-page">
     <div class="login-shell">
         <aside class="login-brand" aria-hidden="true">
-            <p class="login-brand__eyebrow">Civic Library</p>
+            <p class="login-brand__eyebrow">Library</p>
             <h1 class="login-brand__title">Library database</h1>
             <p class="login-brand__tagline">Browse the collection, manage circulation, and keep customer records in one place.</p>
-            <ul class="login-brand__roles" title="Role accent colors used across the app">
+            <ul class="login-brand__roles">
                 <li><span class="swatch swatch--admin"></span> Admin</li>
                 <li><span class="swatch swatch--customer"></span> Customers</li>
             </ul>
@@ -22,23 +22,13 @@
             <div class="login-card">
                 <header class="login-card__header">
                     <h2>Sign in</h2>
-                    <p>Use your library account. Authentication will activate once the database is connected.</p>
+                    <p>Admins sign in with their name and password. Patrons sign in with their name or email and password.</p>
                 </header>
-
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <ul class="flash-list" role="status">
-                    {% for category, msg in messages %}
-                    <li class="flash flash--{{ category }}">{{ msg }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
 
                 <form class="login-form" method="post" action="{{ url_for('login_post') }}" novalidate>
                     <div class="field">
                         <label for="username">Username or email</label>
-                        <input id="username" name="username" type="text" autocomplete="username" placeholder="customer name or email" required>
+                        <input id="username" name="username" type="text" autocomplete="username" placeholder="admin name or patron email" required>
                     </div>
                     <div class="field">
                         <label for="password">Password</label>
@@ -46,21 +36,8 @@
                     </div>
                     <button type="submit" class="btn-submit">Sign in</button>
                 </form>
-
-                {% if dev_skip_login_available %}
-                <div class="dev-skip-login" role="note">
-                    <p class="dev-skip-login__title">Temporary developer access</p>
-                    <p class="dev-skip-login__text">
-                        Real sign-in is not wired yet. Pick a role to open the matching prototype (strict per page).
-                        <strong>This bypass must be removed before release.</strong>
-                    </p>
-                    <ul class="dev-skip-login__roles">
-                        <li><a class="dev-skip-login__role-btn" href="{{ url_for('dev_skip_login', role='admin') }}">Admin</a> → /admin</li>
-                        <li><a class="dev-skip-login__role-btn" href="{{ url_for('dev_skip_login', role='customer') }}">Customer</a> → /customer</li>
-                    </ul>
-                    <p class="dev-skip-login__hint"><a href="{{ url_for('dev_logout') }}">Dev logout</a> (clear session)</p>
-                </div>
-                {% endif %}
-
-                <p class="login-card__footer">
-                    Need an account
+            </div>
+        </main>
+    </div>
+</body>
+</html>

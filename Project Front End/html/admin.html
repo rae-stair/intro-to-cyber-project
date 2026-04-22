@@ -10,32 +10,34 @@
 
 <header class="header">
     <div class="header-left">
-        <span class="back-arrow">←</span>
         <span class="header-title">Admin Portal</span>
     </div>
 
     <div class="header-right">
         <span class="access-badge">Admin - Full Access</span>
-        <button class="logout-btn">Logout</button>
+        <form method="get" action="/dev/logout">
+            <button class="logout-btn">Logout</button>
+        </form>
     </div>
 </header>
 
 <div class="page-content">
 
-    <section class="card wide-card">
-        <h2>Popular Categories</h2>
-        <div class="chart-placeholder">Coming soon…</div>
-    </section>
-
     <section class="row">
 
         <div class="card half-card">
             <h2>Quick Scan by ID</h2>
-            <input type="text" placeholder="Scan barcode or enter ISBN…" disabled>
-            <div class="button-row">
-                <button disabled>Check Out</button>
-                <button disabled>Check In</button>
-            </div>
+
+            <form method="post" action="/admin/scan-checkout" class="scan-form">
+                <input type="text" name="patron_name" placeholder="Patron Name" required>
+                <input type="text" name="book_id" placeholder="Book ID" required>
+                <button class="scan-btn" type="submit">Check Out</button>
+            </form>
+
+            <form method="post" action="/admin/scan-checkin" class="scan-form">
+                <input type="text" name="book_id" placeholder="Book ID" required>
+                <button class="scan-btn" type="submit">Check In</button>
+            </form>
         </div>
 
         <div class="card half-card">
@@ -51,7 +53,7 @@
                         <div class="overdue-title"><em>{{ o.title }}</em></div>
 
                         <div class="overdue-meta">
-                            Due: {{ o.due_date }} • {{ o.phone }} • Book ID: {{ o.book_code }}
+                            Due: {{ o.due_date }}; {{ o.phone }}; Book ID: {{ o.book_id }}
                         </div>
 
                         <div class="overdue-badge">
@@ -73,7 +75,13 @@
         <div class="card wide-card">
             <h2>Patron Management</h2>
 
-            <input type="text" placeholder="Search patrons…" disabled>
+            <form method="post" action="/admin/add-patron" class="add-patron-form">
+                <input type="text" name="name" placeholder="Full name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="text" name="phone" placeholder="Phone" required>
+                <input type="text" name="password" placeholder="Password" required>
+                <button type="submit" class="add-btn">Add Patron</button>
+            </form>
 
             <table class="data-table">
                 <thead>
@@ -83,11 +91,30 @@
                         <th>Phone</th>
                         <th>Books Out</th>
                         <th>Status</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="6" class="loading-cell">Feature coming soon…</td></tr>
+                    {% for p in patrons %}
+                    <tr>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.email }}</td>
+                        <td>{{ p.phone }}</td>
+                        <td>
+                            {% for b in p.books %}
+                                {{ b.title }}<br>
+                            {% else %}
+                                None
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for b in p.books %}
+                                {{ b.status }}<br>
+                            {% else %}
+                                —
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
