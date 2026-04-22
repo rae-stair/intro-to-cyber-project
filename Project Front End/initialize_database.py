@@ -11,13 +11,10 @@ os.makedirs(DB_DIR, exist_ok=True)
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
 
-# -------------------------
-# CREATE TABLES
-# -------------------------
 cur.executescript("""
 CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY,
-    code TEXT NOT NULL,          -- genreNumber-bookNumber (e.g., 1-3)
+    code TEXT NOT NULL,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     genre TEXT NOT NULL,
@@ -28,7 +25,8 @@ CREATE TABLE IF NOT EXISTS patrons (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT,
-    phone TEXT
+    phone TEXT,
+    password TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS admins (
@@ -54,14 +52,6 @@ cur.execute("DELETE FROM patrons;")
 cur.execute("DELETE FROM admins;")
 cur.execute("DELETE FROM checkouts;")
 
-# -------------------------
-# INSERT BOOKS (WITH STATUS + CODE)
-# genreNumber-bookNumber:
-#   1 = Children
-#   2 = Classic
-#   3 = History
-#   4 = Sci-Fi
-# -------------------------
 cur.executescript("""
 INSERT INTO books (id, code, title, author, genre, status) VALUES
 (1,  '1-1', 'Charlotte''s Web', 'E. B. White', 'Children', 'in_stock'),
@@ -89,19 +79,16 @@ INSERT INTO books (id, code, title, author, genre, status) VALUES
 (20, '4-5', 'Fahrenheit 451', 'Ray Bradbury', 'Sci-Fi', 'overdue');
 """)
 
-# -------------------------
-# INSERT PATRONS (NO MEMBER IDS)
-# -------------------------
+
 cur.executescript("""
-INSERT INTO patrons (name, email, phone) VALUES
-('John Doe', 'john@example.com', '555-0001'),
-('Jane Doe', 'jane@example.com', '555-0002'),
-('Jack Doe', 'jack@example.com', '555-0003');
+INSERT INTO patrons (name, email, phone, password) VALUES
+('John Doe', 'john@example.com', '555-0001', 'patron1'),
+('Jane Doe', 'jane@example.com', '555-0002', 'patron2'),
+('Jack Doe', 'jack@example.com', '555-0003', 'patron3'),
+('Jill Doe', 'jill@example.com', '555-0004', 'patron4'),
+('Jerry Doe', 'jerry@example.com', '555-0005', 'patron5');
 """)
 
-# -------------------------
-# INSERT ADMINS
-# -------------------------
 cur.executescript("""
 INSERT INTO admins (name, password) VALUES
 ('Raegan Stair', 'admin1'),
@@ -111,15 +98,12 @@ INSERT INTO admins (name, password) VALUES
 ('Christian Gamble', 'admin5');
 """)
 
-# -------------------------
-# INSERT SAMPLE OVERDUE CHECKOUTS
-# -------------------------
 today = datetime.now()
 
 sample_overdues = [
-    (8, 1, today - timedelta(days=6)),  # Moby-Dick
-    (10, 2, today - timedelta(days=8)), # To Kill a Mockingbird
-    (9, 3, today - timedelta(days=4)),  # The Great Gatsby
+    (8, 1, today - timedelta(days=6)),
+    (10, 2, today - timedelta(days=8)),
+    (9, 3, today - timedelta(days=4)),
 ]
 
 for book_id, patron_id, due in sample_overdues:
@@ -131,4 +115,4 @@ for book_id, patron_id, due in sample_overdues:
 conn.commit()
 conn.close()
 
-print("Database initialized with status + book codes + overdue data.")
+print("Database initialized with patron passwords + status + book codes + overdue data.")
