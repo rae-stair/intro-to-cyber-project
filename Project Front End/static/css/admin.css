@@ -144,6 +144,7 @@ body {
 
 .add-patron-form {
     display: flex;
+    align-items: flex-start;
     gap: 10px;
     margin-bottom: 16px;
 }
@@ -153,6 +154,12 @@ body {
     font-size: 18px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
+}
+
+.password-column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .password-field {
@@ -172,6 +179,30 @@ body {
     padding: 10px 14px;
     font-size: 16px;
     cursor: pointer;
+}
+
+.password-strength {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 240px;
+}
+
+.password-strength meter {
+    width: 120px;
+    height: 14px;
+}
+
+.password-strength span {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.password-policy-hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 320px;
 }
 
 .add-btn {
