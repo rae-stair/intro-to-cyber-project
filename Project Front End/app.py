@@ -1,4 +1,5 @@
 import os
+import re
 import sqlite3
 from flask import Flask, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
 
@@ -14,6 +15,21 @@ def get_db():
     return conn
 
 DEV_ROLES = frozenset({"admin", "customer"})
+MIN_PASSWORD_LENGTH = 12
+COMMON_PASSWORD_BLOCKLIST = frozenset({
+    "password",
+    "password1",
+    "123456",
+    "12345678",
+    "123456789",
+    "qwerty",
+    "abc123",
+    "letmein",
+    "welcome",
+    "admin",
+    "admin123",
+    "iloveyou",
+})
 
 app = Flask(__name__, template_folder="html", static_folder="static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-in-production")
@@ -28,6 +44,28 @@ def _session_has_auth() -> bool:
 
 def _dev_role_ok(role: str) -> bool:
     return _session_has_auth() and session.get("dev_role") == role
+
+def _validate_new_patron_password(password: str) -> str | None:
+    normalized = password.strip()
+    if len(normalized) < MIN_PASSWORD_LENGTH:
+        return f"Password must be at least {MIN_PASSWORD_LENGTH} characters."
+
+    if normalized.lower() in COMMON_PASSWORD_BLOCKLIST:
+        return "Password is too common. Choose a less guessable password."
+
+    if not re.search(r"[A-Z]", normalized):
+        return "Password must include at least one uppercase letter."
+
+    if not re.search(r"[a-z]", normalized):
+        return "Password must include at least one lowercase letter."
+
+    if not re.search(r"[0-9]", normalized):
+        return "Password must include at least one number."
+
+    if not re.search(r"[^A-Za-z0-9]", normalized):
+        return "Password must include at least one symbol."
+
+    return None
 
 @app.context_processor
 def _inject_dev_skip_flag():
@@ -204,9 +242,19 @@ def admin_add_patron():
     email = request.form.get("email", "").strip()
     phone = request.form.get("phone", "").strip()
     password = request.form.get("password", "").strip()
+    confirm_password = request.form.get("confirm_password", "").strip()
 
-    if not name or not email or not phone or not password:
+    if not name or not email or not phone or not password or not confirm_password:
         flash("All fields are required.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if password != confirm_password:
+        flash("Password and confirm password must match.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    password_error = _validate_new_patron_password(password)
+    if password_error:
+        flash(password_error, "error")
         return redirect(url_for("admin_dashboard"))
 
     db = get_db()
