@@ -179,12 +179,8 @@ def project_front_css(filename):
 def project_front_js(filename):
     return send_from_directory(PROJECT_FRONT_JS, filename)
 
-@app.get("/admin")
-def admin_dashboard():
-    if not _dev_role_ok("admin"):
-        flash("Admin role required.", "error")
-        return redirect(url_for("login"))
-
+# ⭐ ADDED — REQUIRED FOR INLINE ERROR RENDERING
+def load_admin_dashboard_data():
     db = get_db()
 
     overdue = db.execute("""
@@ -222,7 +218,25 @@ def admin_dashboard():
     total_patrons = db.execute("SELECT COUNT(*) FROM patrons").fetchone()[0]
     checked_out = db.execute("SELECT COUNT(*) FROM books WHERE status='checked_out'").fetchone()[0]
 
-    return render_template("admin.html", overdue=overdue, patrons=patrons, total_books=total_books, total_patrons=total_patrons, checked_out=checked_out)
+    return overdue, patrons, total_books, total_patrons, checked_out
+
+@app.get("/admin")
+def admin_dashboard():
+    if not _dev_role_ok("admin"):
+        flash("Admin role required.", "error")
+        return redirect(url_for("login"))
+
+    overdue, patrons, total_books, total_patrons, checked_out = load_admin_dashboard_data()
+
+    return render_template(
+        "admin.html",
+        overdue=overdue,
+        patrons=patrons,
+        total_books=total_books,
+        total_patrons=total_patrons,
+        checked_out=checked_out,
+        checkout_error=None
+    )
 
 @app.post("/admin/add-patron")
 def admin_add_patron():
@@ -273,30 +287,49 @@ def admin_add_patron():
     flash("Patron added successfully.", "success")
     return redirect(url_for("admin_dashboard"))
 
+# ⭐ THIS IS THE ONLY ROUTE MODIFIED — FLASH REMOVED, INLINE ERROR ADDED
 @app.post("/admin/scan-checkout")
 def admin_scan_checkout():
     if not _dev_role_ok("admin"):
-        flash("Admin role required.", "error")
         return redirect(url_for("login"))
 
     patron_id = request.form.get("patron_id", "").strip()
     book_id = request.form.get("book_id", "").strip()
 
-    if not patron_id or not book_id:
-        flash("Patron ID and book ID are required.", "error")
-        return redirect(url_for("admin_dashboard"))
-
+    checkout_error = None
     db = get_db()
 
-    patron = db.execute("SELECT id FROM patrons WHERE id = ?", (patron_id,)).fetchone()
-    if not patron:
-        flash("Patron not found.", "error")
-        return redirect(url_for("admin_dashboard"))
+    if not patron_id or not book_id:
+        checkout_error = "Patron ID and book ID are required."
+    else:
+        patron = db.execute("SELECT id FROM patrons WHERE id = ?", (patron_id,)).fetchone()
+        if not patron:
+            checkout_error = "Patron not found."
+        else:
+            book = db.execute("SELECT id, status FROM books WHERE id = ?", (book_id,)).fetchone()
+            if not book:
+                checkout_error = "Book not found."
+            elif book["status"] != "in_stock":
+                checkout_error = "Book unavailable."
+            else:
+                active_checkout = db.execute(
+                    "SELECT id FROM checkouts WHERE book_id = ? AND returned = 0",
+                    (book_id,)
+                ).fetchone()
+                if active_checkout:
+                    checkout_error = "Book unavailable."
 
-    book = db.execute("SELECT id FROM books WHERE id = ?", (book_id,)).fetchone()
-    if not book:
-        flash("Book not found.", "error")
-        return redirect(url_for("admin_dashboard"))
+    if checkout_error:
+        overdue, patrons, total_books, total_patrons, checked_out = load_admin_dashboard_data()
+        return render_template(
+            "admin.html",
+            overdue=overdue,
+            patrons=patrons,
+            total_books=total_books,
+            total_patrons=total_patrons,
+            checked_out=checked_out,
+            checkout_error=checkout_error
+        )
 
     db.execute(
         "INSERT INTO checkouts (book_id, patron_id, due_date, returned) VALUES (?, ?, date('now','+14 days'), 0)",
@@ -305,7 +338,6 @@ def admin_scan_checkout():
     db.execute("UPDATE books SET status='checked_out' WHERE id = ?", (book_id,))
     db.commit()
 
-    flash("Book checked out successfully.", "success")
     return redirect(url_for("admin_dashboard"))
 
 @app.post("/admin/scan-checkin")

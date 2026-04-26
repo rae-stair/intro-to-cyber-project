@@ -34,6 +34,13 @@
                 <button class="scan-btn" type="submit">Check Out</button>
             </form>
 
+            {% if checkout_error %}
+            <div style="color:#c62828; font-size:14px; text-align:center; margin:6px 0;">
+                {{ checkout_error }}
+            </div>
+            {% endif %}
+
+
             <form method="post" action="/admin/scan-checkin" class="scan-form">
                 <input type="text" name="book_id" placeholder="Book ID" required style="width:100%;">
                 <button class="scan-btn" type="submit">Check In</button>
