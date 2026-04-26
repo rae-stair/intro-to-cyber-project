@@ -19,6 +19,17 @@
         </aside>
 
         <main class="login-panel">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <div class="login-card">
                 <header class="login-card__header">
                     <h2>Sign in</h2>

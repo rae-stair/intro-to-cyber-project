@@ -45,6 +45,14 @@ CREATE TABLE IF NOT EXISTS checkouts (
     FOREIGN KEY(book_id) REFERENCES books(id),
     FOREIGN KEY(patron_id) REFERENCES patrons(id)
 );
+                  
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
 """)
 
 # Clear old data
