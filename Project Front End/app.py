@@ -2,6 +2,7 @@ import os
 import re
 import sqlite3
 from flask import Flask, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_FRONT_DIR = os.path.join(ROOT_DIR, "html")
@@ -96,7 +97,7 @@ def login_post():
     ).fetchone()
 
     if admin:
-        if password == admin["password"]:
+        if check_password_hash(admin["password"], password):
             session["dev_skip_auth"] = True
             session["dev_role"] = "admin"
             session.pop("patron_id", None)
@@ -112,7 +113,7 @@ def login_post():
     ).fetchone()
 
     if patron:
-        if password == patron["password"]:
+        if check_password_hash(patron["password"], password):
             session["dev_skip_auth"] = True
             session["dev_role"] = "customer"
             session["patron_id"] = patron["id"]
@@ -171,67 +172,6 @@ def dev_logout():
     flash("Dev session cleared.", "info")
     return redirect(url_for("login"))
 
-@app.get("/admin")
-def admin_dashboard():
-    if not _dev_role_ok("admin"):
-        flash("Admin role required.", "error")
-        return redirect(url_for("login"))
-
-    db = get_db()
-
-    overdue = db.execute(
-        """
-        SELECT patrons.name,
-               patrons.phone,
-               books.id AS book_id,
-               books.title,
-               checkouts.due_date,
-               CAST((julianday('now') - julianday(checkouts.due_date)) AS INT) AS days_overdue
-        FROM checkouts
-        JOIN patrons ON patrons.id = checkouts.patron_id
-        JOIN books ON books.id = checkouts.book_id
-        WHERE checkouts.returned = 0
-          AND julianday('now') > julianday(checkouts.due_date)
-        """
-    ).fetchall()
-
-    patrons_raw = db.execute(
-        "SELECT id, name, email, phone FROM patrons ORDER BY name"
-    ).fetchall()
-
-    patrons = []
-    for p in patrons_raw:
-        books = db.execute(
-            """
-            SELECT books.title, books.status
-            FROM checkouts
-            JOIN books ON books.id = checkouts.book_id
-            WHERE checkouts.patron_id = ?
-              AND checkouts.returned = 0
-            """,
-            (p["id"],)
-        ).fetchall()
-
-        patrons.append({
-            "name": p["name"],
-            "email": p["email"],
-            "phone": p["phone"],
-            "books": books
-        })
-
-    total_books = db.execute("SELECT COUNT(*) FROM books").fetchone()[0]
-    total_patrons = db.execute("SELECT COUNT(*) FROM patrons").fetchone()[0]
-    checked_out = db.execute("SELECT COUNT(*) FROM checkouts WHERE returned = 0").fetchone()[0]
-
-    return render_template(
-        "admin.html",
-        overdue=overdue,
-        patrons=patrons,
-        total_books=total_books,
-        total_patrons=total_patrons,
-        checked_out=checked_out
-    )
-
 @app.post("/admin/add-patron")
 def admin_add_patron():
     if not _dev_role_ok("admin"):
@@ -244,10 +184,6 @@ def admin_add_patron():
     password = request.form.get("password", "").strip()
     confirm_password = request.form.get("confirm_password", "").strip()
 
-    if not name or not email or not phone or not password or not confirm_password:
-        flash("All fields are required.", "error")
-        return redirect(url_for("admin_dashboard"))
-
     if password != confirm_password:
         flash("Password and confirm password must match.", "error")
         return redirect(url_for("admin_dashboard"))
@@ -257,10 +193,12 @@ def admin_add_patron():
         flash(password_error, "error")
         return redirect(url_for("admin_dashboard"))
 
+    hashed = generate_password_hash(password)
+
     db = get_db()
     db.execute(
         "INSERT INTO patrons (name, email, phone, password) VALUES (?, ?, ?, ?)",
-        (name, email, phone, password)
+        (name, email, phone, hashed)
     )
     db.commit()
 
