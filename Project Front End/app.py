@@ -210,7 +210,13 @@ def admin_dashboard():
             WHERE checkouts.patron_id = ?
               AND checkouts.returned = 0
         """, (p["id"],)).fetchall()
-        patrons.append({"name": p["name"], "email": p["email"], "phone": p["phone"], "books": books_out})
+        patrons.append({
+            "id": p["id"],
+            "name": p["name"],
+            "email": p["email"],
+            "phone": p["phone"],
+            "books": books_out
+        })
 
     total_books = db.execute("SELECT COUNT(*) FROM books").fetchone()[0]
     total_patrons = db.execute("SELECT COUNT(*) FROM patrons").fetchone()[0]
@@ -258,7 +264,10 @@ def admin_add_patron():
     hashed = generate_password_hash(password)
 
     db = get_db()
-    db.execute("INSERT INTO patrons (name, email, phone, password) VALUES (?, ?, ?, ?)", (name, email, phone, hashed))
+    db.execute(
+        "INSERT INTO patrons (name, email, phone, password) VALUES (?, ?, ?, ?)",
+        (name, email, phone, hashed)
+    )
     db.commit()
 
     flash("Patron added successfully.", "success")
@@ -270,16 +279,16 @@ def admin_scan_checkout():
         flash("Admin role required.", "error")
         return redirect(url_for("login"))
 
-    patron_name = request.form.get("patron_name", "").strip()
+    patron_id = request.form.get("patron_id", "").strip()
     book_id = request.form.get("book_id", "").strip()
 
-    if not patron_name or not book_id:
-        flash("Patron name and book ID are required.", "error")
+    if not patron_id or not book_id:
+        flash("Patron ID and book ID are required.", "error")
         return redirect(url_for("admin_dashboard"))
 
     db = get_db()
 
-    patron = db.execute("SELECT id FROM patrons WHERE name = ?", (patron_name,)).fetchone()
+    patron = db.execute("SELECT id FROM patrons WHERE id = ?", (patron_id,)).fetchone()
     if not patron:
         flash("Patron not found.", "error")
         return redirect(url_for("admin_dashboard"))
@@ -289,7 +298,10 @@ def admin_scan_checkout():
         flash("Book not found.", "error")
         return redirect(url_for("admin_dashboard"))
 
-    db.execute("INSERT INTO checkouts (book_id, patron_id, due_date, returned) VALUES (?, ?, date('now','+14 days'), 0)", (book_id, patron["id"]))
+    db.execute(
+        "INSERT INTO checkouts (book_id, patron_id, due_date, returned) VALUES (?, ?, date('now','+14 days'), 0)",
+        (book_id, patron_id)
+    )
     db.execute("UPDATE books SET status='checked_out' WHERE id = ?", (book_id,))
     db.commit()
 
@@ -352,7 +364,10 @@ def reserve_book(book_id):
         return redirect(url_for("login"))
 
     db = get_db()
-    db.execute("INSERT INTO checkouts (book_id, patron_id, due_date, returned) VALUES (?, ?, date('now','+14 days'), 0)", (book_id, patron_id))
+    db.execute(
+        "INSERT INTO checkouts (book_id, patron_id, due_date, returned) VALUES (?, ?, date('now','+14 days'), 0)",
+        (book_id, patron_id)
+    )
     db.execute("UPDATE books SET status='checked_out' WHERE id = ?", (book_id,))
     db.commit()
 
@@ -371,7 +386,10 @@ def cancel_book(book_id):
         return redirect(url_for("login"))
 
     db = get_db()
-    db.execute("UPDATE checkouts SET returned=1 WHERE book_id = ? AND patron_id = ? AND returned = 0", (book_id, patron_id))
+    db.execute(
+        "UPDATE checkouts SET returned=1 WHERE book_id = ? AND patron_id = ? AND returned = 0",
+        (book_id, patron_id)
+    )
     db.execute("UPDATE books SET status='in_stock' WHERE id = ?", (book_id,))
     db.commit()
 
