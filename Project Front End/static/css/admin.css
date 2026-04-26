@@ -148,6 +148,32 @@ body {
     margin-bottom: 16px;
 }
 
+.add-patron-form input {
+    padding: 14px 16px;
+    font-size: 18px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+}
+
+.password-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-field input {
+    flex: 1;
+}
+
+.toggle-password-btn {
+    background: #e7e9ef;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 .add-btn {
     background: var(--admin-green-light);
     color: white;
