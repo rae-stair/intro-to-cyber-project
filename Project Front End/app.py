@@ -3,6 +3,7 @@ import sqlite3
 from flask import Flask, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash from collections import defaultdict
 import time
+import re
 
 login_attempts = defaultdict(list)
 
@@ -170,6 +171,32 @@ def admin_add_patron():
     if not name or not email or not phone or not password:
         flash("All fields are required.", "error")
         return redirect(url_for("admin_dashboard"))
+
+    if len(name) > 50:
+        flash("Name too long.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if len(email) > 100:
+        flash("Email too long.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        flash("Invalid email format.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if not phone.isdigit() or len(phone) < 7:
+        flash("Invalid phone number.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    db = get_db()
+    db.execute(
+        "INSERT INTO patrons (name, email, phone, password) VALUES (?, ?, ?, ?)",
+        (name, email, phone, password)
+    )
+    db.commit()
+
+    flash("Patron added successfully.", "success")
+    return redirect(url_for("admin_dashboard"))
 
     db = get_db()
     db.execute(
