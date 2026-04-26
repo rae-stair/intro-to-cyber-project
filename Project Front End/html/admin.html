@@ -75,11 +75,17 @@
         <div class="card wide-card">
             <h2>Patron Management</h2>
 
+            <!-- ⭐ FIXED FORM STARTS HERE -->
             <form method="post" action="/admin/add-patron" class="add-patron-form">
+
+                <!-- Row 1 -->
                 <input type="text" name="name" placeholder="Full name" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="text" name="phone" placeholder="Phone" required>
+
+                <!-- Row 2: Password + Confirm Password -->
                 <div class="password-column">
+
                     <div class="password-field">
                         <input
                             id="patron-password"
@@ -91,24 +97,38 @@
                         >
                         <button type="button" class="toggle-password-btn" data-toggle-target="patron-password">Show</button>
                     </div>
+
+                    <div class="password-field">
+                        <input
+                            id="patron-password-confirm"
+                            type="password"
+                            name="confirm_password"
+                            placeholder="Confirm password"
+                            autocomplete="new-password"
+                            required
+                        >
+                        <button type="button" class="toggle-password-btn" data-toggle-target="patron-password-confirm">Show</button>
+                    </div>
+
+                    <!-- Row 3: Strength + Policy -->
                     <div class="password-strength" aria-live="polite">
                         <meter id="patron-password-strength" min="0" max="5" value="0"></meter>
                         <span id="patron-password-strength-label">Very weak</span>
                     </div>
+
                     <p class="password-policy-hint">
                         Use at least 12 characters with uppercase, lowercase, number, and symbol.
                     </p>
+
+                    <!-- ⭐ BUTTON NOW DIRECTLY UNDER CONFIRM PASSWORD ⭐ -->
+                    <button type="submit" class="add-btn" style="grid-column: 1 / 3; margin-top: 10px;">
+                        Add Patron
+                    </button>
+
                 </div>
-                <input
-                    id="patron-password-confirm"
-                    type="password"
-                    name="confirm_password"
-                    placeholder="Confirm password"
-                    autocomplete="new-password"
-                    required
-                >
-                <button type="submit" class="add-btn">Add Patron</button>
+
             </form>
+            <!-- ⭐ FIXED FORM ENDS HERE -->
 
             <table class="data-table">
                 <thead>
