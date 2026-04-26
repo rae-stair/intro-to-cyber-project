@@ -53,6 +53,7 @@ cur.execute("DELETE FROM patrons;")
 cur.execute("DELETE FROM admins;")
 cur.execute("DELETE FROM checkouts;")
 
+# Insert books
 cur.executescript("""
 INSERT INTO books (id, code, title, author, genre, status) VALUES
 (1,  '1-1', 'Charlotte''s Web', 'E. B. White', 'Children', 'in_stock'),
