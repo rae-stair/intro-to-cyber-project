@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tab.addEventListener("click", () => setActiveTab(tab.dataset.tab));
     });
 
-    // SEARCH
     const searchInput = document.getElementById("search-bar");
 
     if (searchInput) {

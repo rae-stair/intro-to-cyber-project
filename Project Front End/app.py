@@ -84,6 +84,14 @@ def _validate_new_patron_password(password):
 app = Flask(__name__, template_folder="html", static_folder="static")
 app.secret_key = "supersecretdevkey123"
 
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 @app.get("/dev/skip-login/<role>")
 def dev_skip_login(role):
     if role not in DEV_ROLES:
@@ -179,7 +187,6 @@ def project_front_css(filename):
 def project_front_js(filename):
     return send_from_directory(PROJECT_FRONT_JS, filename)
 
-# ⭐ ADDED — REQUIRED FOR INLINE ERROR RENDERING
 def load_admin_dashboard_data():
     db = get_db()
 
@@ -236,7 +243,11 @@ def admin_dashboard():
         total_patrons=total_patrons,
         checked_out=checked_out,
         checkout_error=None
-    )
+    ), 200, {
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    }
 
 @app.post("/admin/add-patron")
 def admin_add_patron():
@@ -287,7 +298,6 @@ def admin_add_patron():
     flash("Patron added successfully.", "success")
     return redirect(url_for("admin_dashboard"))
 
-# ⭐ THIS IS THE ONLY ROUTE MODIFIED — FLASH REMOVED, INLINE ERROR ADDED
 @app.post("/admin/scan-checkout")
 def admin_scan_checkout():
     if not _dev_role_ok("admin"):
@@ -427,6 +437,9 @@ def cancel_book(book_id):
 
     flash("Book returned successfully.", "success")
     return redirect(url_for("customer_home"))
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

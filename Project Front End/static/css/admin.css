@@ -142,10 +142,9 @@ body {
     cursor: pointer;
 }
 
-/* ⭐ FIXED LAYOUT — UNIFORM INPUT SIZES + CLEAN ROWS */
 .add-patron-form {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Name | Email | Phone */
+    grid-template-columns: repeat(3, 1fr); 
     gap: 16px;
     margin-bottom: 16px;
 }
@@ -158,25 +157,23 @@ body {
     border-radius: var(--radius-md);
 }
 
-/* ⭐ Password + Confirm Password on their own row */
+
 .password-column {
-    grid-column: 1 / 4; /* full width */
+    grid-column: 1 / 4; 
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Password | Confirm Password */
+    grid-template-columns: repeat(2, 1fr); 
     gap: 16px;
 }
 
-/* ⭐ Make password boxes EXACTLY the same size as other inputs */
 .password-field {
     position: relative;
 }
 
 .password-field input {
     width: 100%;
-    padding-right: 50px; /* space for toggle button */
+    padding-right: 50px; 
 }
 
-/* ⭐ Toggle button sits INSIDE the box, not expanding it */
 .toggle-password-btn {
     position: absolute;
     right: 8px;
@@ -194,7 +191,6 @@ body {
     cursor: pointer;
 }
 
-/* ⭐ Password strength + policy spacing fixed */
 .password-strength {
     grid-column: 1 / 4;
     display: flex;

@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <title>Admin Portal</title>
     <link rel="stylesheet" href="/_pf/css/admin.css">
+
+    <script>
+        // If the user presses Back after logout, this forces a reload.
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -134,7 +143,7 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>ID</th> <!-- ADDED -->
+                        <th>ID</th> 
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -145,7 +154,7 @@
                 <tbody>
                     {% for p in patrons %}
                     <tr>
-                        <td>{{ p.id }}</td> <!-- ADDED -->
+                        <td>{{ p.id }}</td> 
                         <td>{{ p.name }}</td>
                         <td>{{ p.email }}</td>
                         <td>{{ p.phone }}</td>
