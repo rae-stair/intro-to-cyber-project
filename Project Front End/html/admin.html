@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <title>Admin Portal</title>
     <link rel="stylesheet" href="/_pf/css/admin.css">
+
+    <script>
+        // If the user presses Back after logout, this forces a reload.
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </head>
 
 <body>
