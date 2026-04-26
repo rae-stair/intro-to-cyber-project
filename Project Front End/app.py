@@ -68,6 +68,19 @@ def _session_has_auth():
 def _dev_role_ok(role):
     return _session_has_auth() and session.get("dev_role") == role
 
+def _validate_new_patron_password(password):
+    if len(password) < 12:
+        return "Password must be at least 12 characters long."
+    if not re.search(r"[A-Z]", password):
+        return "Password must contain at least one uppercase letter."
+    if not re.search(r"[a-z]", password):
+        return "Password must contain at least one lowercase letter."
+    if not re.search(r"[0-9]", password):
+        return "Password must contain at least one number."
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return "Password must contain at least one symbol."
+    return None
+
 app = Flask(__name__, template_folder="html", static_folder="static")
 app.secret_key = "supersecretdevkey123"
 
@@ -219,6 +232,27 @@ def admin_add_patron():
 
     if password != confirm_password:
         flash("Password and confirm password must match.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if len(name) > 50:
+        flash("Name too long.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if len(email) > 100:
+        flash("Email too long.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        flash("Invalid email format.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if not phone.isdigit() or len(phone) < 7:
+        flash("Invalid phone number.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    password_error = _validate_new_patron_password(password)
+    if password_error:
+        flash(password_error, "error")
         return redirect(url_for("admin_dashboard"))
 
     hashed = generate_password_hash(password)
