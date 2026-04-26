@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from flask import Flask, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_FRONT_DIR = os.path.join(ROOT_DIR, "html")
@@ -41,15 +42,15 @@ def login_post():
     ).fetchone()
 
     if admin:
-        if password == admin["password"]:
-            session.clear()
-            session["admin_id"] = admin["id"]
-            session.pop("patron_id", None)
-            flash(f"Welcome back, {admin['name']}!", "success")
-            return redirect(url_for("admin_dashboard"))
-        else:
-            flash("Incorrect password for admin account.", "error")
-            return redirect(url_for("login"))
+    if check_password_hash(admin["password"], password):
+        session.clear()
+        session["admin_id"] = admin["id"]
+        session.pop("patron_id", None)
+        flash(f"Welcome back, {admin['name']}!", "success")
+        return redirect(url_for("admin_dashboard"))
+    else:
+        flash("Incorrect password for admin account.", "error")
+        return redirect(url_for("login"))
 
     patron = db.execute(
         "SELECT id, name, email, password FROM patrons WHERE name = ? OR email = ?",
@@ -57,7 +58,7 @@ def login_post():
     ).fetchone()
 
     if patron:
-        if password == patron["password"]:
+        if check_password_hash(patron["password"], password):
             session.clear()
             session["patron_id"] = patron["id"]
             flash(f"Welcome, {patron['name']}!", "success")
