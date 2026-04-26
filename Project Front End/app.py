@@ -80,13 +80,24 @@ def home():
 def login():
     return render_template("login.html")
 
-@app.post("/login")
+ @app.post("/login")
 def login_post():
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
 
     if not username or not password:
         flash("Username and password are required.", "error")
+        return redirect(url_for("login"))
+
+    ip = request.remote_addr
+    now = time.time()
+
+    # remove old attempts (older than 60 seconds)
+    login_attempts[ip] = [t for t in login_attempts[ip] if now - t < 60]
+
+    # block if too many attempts
+    if len(login_attempts[ip]) >= 5:
+        flash("Too many login attempts. Try again later.", "error")
         return redirect(url_for("login"))
 
     db = get_db()
@@ -188,6 +199,31 @@ def admin_add_patron():
         flash("Password and confirm password must match.", "error")
         return redirect(url_for("admin_dashboard"))
 
+    if len(name) > 50:
+        flash("Name too long.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if len(email) > 100:
+        flash("Email too long.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        flash("Invalid email format.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if not phone.isdigit() or len(phone) < 7:
+        flash("Invalid phone number.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    db = get_db()
+    db.execute(
+        "INSERT INTO patrons (name, email, phone, password) VALUES (?, ?, ?, ?)",
+        (name, email, phone, password)
+    )
+    db.commit()
+
+    flash("Patron added successfully.", "success")
+    return redirect(url_for("admin_dashboard"))
     password_error = _validate_new_patron_password(password)
     if password_error:
         flash(password_error, "error")
