@@ -28,7 +28,6 @@ body {
     color: var(--text-main);
 }
 
-/* HEADER */
 
 .admin-header {
     background: var(--admin-green);
@@ -58,8 +57,6 @@ body {
     font-size: 0.85rem;
 }
 
-/* TABS */
-
 .admin-tabs {
     display: flex;
     gap: 32px;
@@ -86,13 +83,9 @@ body {
     border-bottom-color: var(--admin-green);
 }
 
-/* MAIN LAYOUT */
-
 .admin-main {
     padding: 24px 32px 40px;
 }
-
-/* PANELS */
 
 .panel {
     background: var(--card-bg);
@@ -122,7 +115,6 @@ body {
     padding: 16px 18px 18px;
 }
 
-/* TABLE */
 
 .table-wrapper {
     width: 100%;
@@ -157,7 +149,6 @@ body {
     background: #fafafe;
 }
 
-/* STATUS PILL */
 
 .status-pill {
     display: inline-flex;
@@ -178,7 +169,6 @@ body {
     color: var(--text-muted);
 }
 
-/* BUTTONS */
 
 .btn {
     border-radius: 999px;
@@ -220,7 +210,6 @@ body {
     background: #a32020;
 }
 
-/* TABS PANELS */
 
 .tab-panel {
     display: none;
@@ -230,7 +219,6 @@ body {
     display: block;
 }
 
-/* RESPONSIVE */
 
 @media (max-width: 900px) {
     .admin-header {

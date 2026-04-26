@@ -55,13 +55,11 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 
 """)
 
-# Clear old data
 cur.execute("DELETE FROM books;")
 cur.execute("DELETE FROM patrons;")
 cur.execute("DELETE FROM admins;")
 cur.execute("DELETE FROM checkouts;")
 
-# Insert books
 cur.executescript("""
 INSERT INTO books (id, code, title, author, genre, status) VALUES
 (1,  '1-1', 'Charlotte''s Web', 'E. B. White', 'Children', 'in_stock'),
@@ -89,7 +87,6 @@ INSERT INTO books (id, code, title, author, genre, status) VALUES
 (20, '4-5', 'Fahrenheit 451', 'Ray Bradbury', 'Sci-Fi', 'overdue');
 """)
 
-# Insert patrons with hashed passwords
 patrons = [
     ('John Doe', 'john@example.com', '555-0001', 'patron1'),
     ('Jane Doe', 'jane@example.com', '555-0002', 'patron2'),
@@ -104,7 +101,6 @@ for name, email, phone, pw in patrons:
         (name, email, phone, generate_password_hash(pw))
     )
 
-# Insert admins with hashed passwords
 admins = [
     ('Raegan Stair', 'admin1'),
     ('Justin McCright', 'admin2'),
@@ -119,7 +115,6 @@ for name, pw in admins:
         (name, generate_password_hash(pw))
     )
 
-# Overdue sample data
 today = datetime.now()
 
 sample_overdues = [

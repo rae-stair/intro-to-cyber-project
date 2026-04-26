@@ -298,7 +298,6 @@ def admin_add_patron():
     flash("Patron added successfully.", "success")
     return redirect(url_for("admin_dashboard"))
 
-# ⭐ THIS IS THE ONLY ROUTE MODIFIED — FLASH REMOVED, INLINE ERROR ADDED
 @app.post("/admin/scan-checkout")
 def admin_scan_checkout():
     if not _dev_role_ok("admin"):
