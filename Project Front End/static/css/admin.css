@@ -142,50 +142,65 @@ body {
     cursor: pointer;
 }
 
+/* ⭐ FIXED LAYOUT — UNIFORM INPUT SIZES + CLEAN ROWS */
 .add-patron-form {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Name | Email | Phone */
+    gap: 16px;
     margin-bottom: 16px;
 }
 
 .add-patron-form input {
+    width: 100%;
     padding: 14px 16px;
     font-size: 18px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
 }
 
+/* ⭐ Password + Confirm Password on their own row */
 .password-column {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    grid-column: 1 / 4; /* full width */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Password | Confirm Password */
+    gap: 16px;
 }
 
+/* ⭐ Make password boxes EXACTLY the same size as other inputs */
 .password-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    position: relative;
 }
 
 .password-field input {
-    flex: 1;
+    width: 100%;
+    padding-right: 50px; /* space for toggle button */
 }
 
+/* ⭐ Toggle button sits INSIDE the box, not expanding it */
 .toggle-password-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 6px 10px;
+    font-size: 14px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #e7e9ef;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 10px 14px;
-    font-size: 16px;
     cursor: pointer;
 }
 
+/* ⭐ Password strength + policy spacing fixed */
 .password-strength {
+    grid-column: 1 / 4;
     display: flex;
     align-items: center;
     gap: 10px;
-    min-width: 240px;
+    margin-top: -4px;
 }
 
 .password-strength meter {
@@ -199,10 +214,11 @@ body {
 }
 
 .password-policy-hint {
-    margin: 0;
-    font-size: 13px;
+    grid-column: 1 / 4;
+    margin-top: -6px;
+    font-size: 14px;
     color: var(--text-muted);
-    max-width: 320px;
+    max-width: 420px;
 }
 
 .add-btn {

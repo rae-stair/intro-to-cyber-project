@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_DIR = os.path.join(ROOT_DIR, "db")
@@ -52,6 +53,7 @@ cur.execute("DELETE FROM patrons;")
 cur.execute("DELETE FROM admins;")
 cur.execute("DELETE FROM checkouts;")
 
+# Insert books
 cur.executescript("""
 INSERT INTO books (id, code, title, author, genre, status) VALUES
 (1,  '1-1', 'Charlotte''s Web', 'E. B. White', 'Children', 'in_stock'),
@@ -79,25 +81,37 @@ INSERT INTO books (id, code, title, author, genre, status) VALUES
 (20, '4-5', 'Fahrenheit 451', 'Ray Bradbury', 'Sci-Fi', 'overdue');
 """)
 
+# Insert patrons with hashed passwords
+patrons = [
+    ('John Doe', 'john@example.com', '555-0001', 'patron1'),
+    ('Jane Doe', 'jane@example.com', '555-0002', 'patron2'),
+    ('Jack Doe', 'jack@example.com', '555-0003', 'patron3'),
+    ('Jill Doe', 'jill@example.com', '555-0004', 'patron4'),
+    ('Jerry Doe', 'jerry@example.com', '555-0005', 'patron5'),
+]
 
-cur.executescript("""
-INSERT INTO patrons (name, email, phone, password) VALUES
-('John Doe', 'john@example.com', '555-0001', 'patron1'),
-('Jane Doe', 'jane@example.com', '555-0002', 'patron2'),
-('Jack Doe', 'jack@example.com', '555-0003', 'patron3'),
-('Jill Doe', 'jill@example.com', '555-0004', 'patron4'),
-('Jerry Doe', 'jerry@example.com', '555-0005', 'patron5');
-""")
+for name, email, phone, pw in patrons:
+    cur.execute(
+        "INSERT INTO patrons (name, email, phone, password) VALUES (?, ?, ?, ?)",
+        (name, email, phone, generate_password_hash(pw))
+    )
 
-cur.executescript("""
-INSERT INTO admins (name, password) VALUES
-('Raegan Stair', 'admin1'),
-('Justin McCright', 'admin2'),
-('Minseo Lee', 'admin3'),
-('Troy Boatner', 'admin4'),
-('Christian Gamble', 'admin5');
-""")
+# Insert admins with hashed passwords
+admins = [
+    ('Raegan Stair', 'admin1'),
+    ('Justin McCright', 'admin2'),
+    ('Minseo Lee', 'admin3'),
+    ('Troy Boatner', 'admin4'),
+    ('Christian Gamble', 'admin5'),
+]
 
+for name, pw in admins:
+    cur.execute(
+        "INSERT INTO admins (name, password) VALUES (?, ?)",
+        (name, generate_password_hash(pw))
+    )
+
+# Overdue sample data
 today = datetime.now()
 
 sample_overdues = [
@@ -115,4 +129,4 @@ for book_id, patron_id, due in sample_overdues:
 conn.commit()
 conn.close()
 
-print("Database initialized with patron passwords + status + book codes + overdue data.")
+print("Database initialized with hashed passwords + status + book codes + overdue data.")
