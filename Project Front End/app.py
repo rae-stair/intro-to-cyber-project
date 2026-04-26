@@ -1,7 +1,10 @@
 import os
 import sqlite3
 from flask import Flask, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash from collections import defaultdict
+import time
+
+login_attempts = defaultdict(list)
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_FRONT_DIR = os.path.join(ROOT_DIR, "html")
@@ -25,13 +28,24 @@ def home():
 def login():
     return render_template("login.html")
 
-@app.post("/login")
+ @app.post("/login")
 def login_post():
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
 
     if not username or not password:
         flash("Username and password are required.", "error")
+        return redirect(url_for("login"))
+
+    ip = request.remote_addr
+    now = time.time()
+
+    # remove old attempts (older than 60 seconds)
+    login_attempts[ip] = [t for t in login_attempts[ip] if now - t < 60]
+
+    # block if too many attempts
+    if len(login_attempts[ip]) >= 5:
+        flash("Too many login attempts. Try again later.", "error")
         return redirect(url_for("login"))
 
     db = get_db()
