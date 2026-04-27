@@ -57,17 +57,6 @@ def is_cooldown_over(last_attempt):
     now = datetime.datetime.utcnow()
     return (now - last).total_seconds() >= COOLDOWN_SECONDS
 
-DEV_ROLES = {"admin", "customer"}
-
-def _dev_skip_login_enabled():
-    return True
-
-def _session_has_auth():
-    return bool(session.get("dev_skip_auth"))
-
-def _dev_role_ok(role):
-    return _session_has_auth() and session.get("dev_role") == role
-
 def _validate_new_patron_password(password):
     if len(password) < 12:
         return "Password must be at least 12 characters long."
@@ -90,25 +79,6 @@ def add_no_cache_headers(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-
-
-@app.get("/dev/skip-login/<role>")
-def dev_skip_login(role):
-    if role not in DEV_ROLES:
-        flash("Invalid dev role.", "error")
-        return redirect(url_for("login"))
-    session["dev_skip_auth"] = True
-    session["dev_role"] = role
-    if role == "customer":
-        session["patron_id"] = 1
-        return redirect(url_for("customer_home"))
-    session.pop("patron_id", None)
-    return redirect(url_for("admin_dashboard"))
-
-@app.get("/dev/logout")
-def dev_logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 @app.route("/")
 def home():
@@ -150,8 +120,8 @@ def login_post():
     if admin:
         if check_password_hash(admin["password"], password):
             reset_attempts(ip)
-            session["dev_skip_auth"] = True
-            session["dev_role"] = "admin"
+            session.clear()
+            session["admin_id"] = admin["id"]
             session.pop("patron_id", None)
             return redirect(url_for("admin_dashboard"))
         increment_attempts(ip)
@@ -162,8 +132,7 @@ def login_post():
     if patron:
         if check_password_hash(patron["password"], password):
             reset_attempts(ip)
-            session["dev_skip_auth"] = True
-            session["dev_role"] = "customer"
+            session.clear()
             session["patron_id"] = patron["id"]
             return redirect(url_for("customer_home"))
         increment_attempts(ip)
@@ -229,10 +198,11 @@ def load_admin_dashboard_data():
 
 @app.get("/admin")
 def admin_dashboard():
-    if not _dev_role_ok("admin"):
-        flash("Admin role required.", "error")
-        return redirect(url_for("login"))
 
+    if "admin_id" not in session:
+        flash("Admin login is required.", "error")
+        return redirect(url_for("login"))
+    
     overdue, patrons, total_books, total_patrons, checked_out = load_admin_dashboard_data()
 
     return render_template(
@@ -251,9 +221,6 @@ def admin_dashboard():
 
 @app.post("/admin/add-patron")
 def admin_add_patron():
-    if not _dev_role_ok("admin"):
-        flash("Admin role required.", "error")
-        return redirect(url_for("login"))
 
     name = request.form.get("name", "").strip()
     email = request.form.get("email", "").strip()
@@ -300,8 +267,6 @@ def admin_add_patron():
 
 @app.post("/admin/scan-checkout")
 def admin_scan_checkout():
-    if not _dev_role_ok("admin"):
-        return redirect(url_for("login"))
 
     patron_id = request.form.get("patron_id", "").strip()
     book_id = request.form.get("book_id", "").strip()
@@ -352,9 +317,6 @@ def admin_scan_checkout():
 
 @app.post("/admin/scan-checkin")
 def admin_scan_checkin():
-    if not _dev_role_ok("admin"):
-        flash("Admin role required.", "error")
-        return redirect(url_for("login"))
 
     book_id = request.form.get("book_id", "").strip()
 
@@ -372,8 +334,10 @@ def admin_scan_checkin():
 
 @app.get("/customer")
 def customer_home():
-    if not _dev_role_ok("customer"):
-        flash("Customer role required.", "error")
+
+    patron_id = session.get("patron_id")
+    if patron_id is None:
+        flash("Patron login is required.", "error")
         return redirect(url_for("login"))
 
     db = get_db()
@@ -396,9 +360,6 @@ def customer_home():
 
 @app.post("/books/reserve/<int:book_id>")
 def reserve_book(book_id):
-    if not _dev_role_ok("customer"):
-        flash("Customer role required.", "error")
-        return redirect(url_for("login"))
 
     patron_id = session.get("patron_id")
     if not patron_id:
@@ -418,9 +379,6 @@ def reserve_book(book_id):
 
 @app.post("/books/cancel/<int:book_id>")
 def cancel_book(book_id):
-    if not _dev_role_ok("customer"):
-        flash("Customer role required.", "error")
-        return redirect(url_for("login"))
 
     patron_id = session.get("patron_id")
     if not patron_id:
@@ -437,8 +395,6 @@ def cancel_book(book_id):
 
     flash("Book returned successfully.", "success")
     return redirect(url_for("customer_home"))
-
-
 
 
 if __name__ == "__main__":
