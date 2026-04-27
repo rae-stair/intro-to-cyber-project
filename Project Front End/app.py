@@ -57,11 +57,6 @@ def is_cooldown_over(last_attempt):
     now = datetime.datetime.utcnow()
     return (now - last).total_seconds() >= COOLDOWN_SECONDS
 
-DEV_ROLES = {"admin", "customer"}
-
-def _dev_skip_login_enabled():
-    return True
-
 def _session_has_auth():
     return bool(session.get("dev_skip_auth"))
 
@@ -91,24 +86,6 @@ def add_no_cache_headers(response):
     response.headers["Expires"] = "0"
     return response
 
-
-@app.get("/dev/skip-login/<role>")
-def dev_skip_login(role):
-    if role not in DEV_ROLES:
-        flash("Invalid dev role.", "error")
-        return redirect(url_for("login"))
-    session["dev_skip_auth"] = True
-    session["dev_role"] = role
-    if role == "customer":
-        session["patron_id"] = 1
-        return redirect(url_for("customer_home"))
-    session.pop("patron_id", None)
-    return redirect(url_for("admin_dashboard"))
-
-@app.get("/dev/logout")
-def dev_logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 @app.route("/")
 def home():
